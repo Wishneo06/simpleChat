@@ -71,7 +71,10 @@ public class ChatClient extends AbstractClient
   {
     try
     {
-      sendToServer(message);
+      if (message.startsWith("#"))
+    	  handleCommand(message);
+      else
+    	  sendToServer(message);
     }
     catch(IOException e)
     {
@@ -79,6 +82,51 @@ public class ChatClient extends AbstractClient
         ("Could not send message to server.  Terminating client.");
       quit();
     }
+  }
+  
+  private void handleCommand (String command) {
+	  if (command.equals("#quit")) {
+		 
+		  quit();
+	  }
+	  else if (command.equals("#logoff")) {
+		try {
+			closeConnection();
+		} catch (IOException e) {
+			System.out.println("No connection to close");
+		}
+	  }
+	  else if (command.substring(0, 7).equals("#sethost")) {
+		  try {
+			  setHost(command.substring(9));
+		  }
+		  catch (Exception e) {
+			  System.out.println("Invalid Input for setHost");
+		  }
+	  }
+	  else if (command.equals("#setport")) {
+		  try {
+			  setPort(Integer.parseInt(command.substring(9)));
+		  }
+		  catch (Exception e) {
+			  System.out.println("Invalid Input for port");
+		  }
+	  }
+	  else if (command.equals("#login")) {
+		  try {
+			openConnection();
+		} catch (IOException e) {
+			System.out.println("#login error");
+		}
+	  }
+	  else if (command.equals("#gethost")) {
+		  System.out.println(getHost());
+	  }
+	  else if (command.equals("#getport")) {
+		  System.out.println(getPort());
+	  }
+	  
+		  
   }
   
   /**
@@ -93,5 +141,30 @@ public class ChatClient extends AbstractClient
     catch(IOException e) {}
     System.exit(0);
   }
+  
+	/**
+	 * Implements the hook method called after the connection has been closed. The default
+	 * implementation does nothing. The method may be overriden by subclasses to
+	 * perform special processing such as cleaning up and terminating, or
+	 * attempting to reconnect.
+	 */
+  	@Override
+	protected void connectionClosed() {
+  		clientUI.display("Connection closed");
+	}
+
+	/**
+	 * Implements the hook method called each time an exception is thrown by the client's
+	 * thread that is waiting for messages from the server. The method may be
+	 * overridden by subclasses.
+	 * 
+	 * @param exception
+	 *            the exception raised.
+	 */
+  	@Override
+	protected void connectionException(Exception exception) {
+  		clientUI.display("The server has shut down");
+  		quit();
+	}
 }
 //End of ChatClient class
