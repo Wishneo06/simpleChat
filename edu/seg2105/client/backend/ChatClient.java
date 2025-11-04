@@ -8,6 +8,8 @@ import ocsf.client.*;
 
 import java.io.*;
 
+import javax.management.RuntimeErrorException;
+
 import edu.seg2105.client.common.*;
 
 /**
@@ -86,44 +88,66 @@ public class ChatClient extends AbstractClient
   
   private void handleCommand (String command) {
 	  if (command.equals("#quit")) {
-		 
+		try {
+			sendToServer("#quit");
+		} catch (IOException e) {
+			System.out.println("Error: Can't Quit");
+		}
 		  quit();
 	  }
 	  else if (command.equals("#logoff")) {
 		try {
+			sendToServer("#logoff");
 			closeConnection();
 		} catch (IOException e) {
 			System.out.println("No connection to close");
 		}
 	  }
-	  else if (command.substring(0, 7).equals("#sethost")) {
+	  else if (command.startsWith("#sethost")) {
 		  try {
+			  if (isConnected())
+				  throw new RuntimeException ();
 			  setHost(command.substring(9));
+			  clientUI.display("Change Successful");
+		  }
+		  catch (RuntimeException e) {
+			  clientUI.display("Error, client is still connected to server");
 		  }
 		  catch (Exception e) {
-			  System.out.println("Invalid Input for setHost");
+			  clientUI.display("Error: Invalid Input for setHost");
 		  }
 	  }
-	  else if (command.equals("#setport")) {
+	  else if (command.startsWith("#setport")) {
 		  try {
+			  if (isConnected())
+				  throw new RuntimeException ();
 			  setPort(Integer.parseInt(command.substring(9)));
+			  clientUI.display("Change Successful");
 		  }
 		  catch (Exception e) {
-			  System.out.println("Invalid Input for port");
+			  clientUI.display("Error: Invalid Input for port");
 		  }
 	  }
 	  else if (command.equals("#login")) {
 		  try {
-			openConnection();
-		} catch (IOException e) {
-			System.out.println("#login error");
-		}
+			  if (isConnected())
+				  throw new RuntimeException();
+			  openConnection();
+			  clientUI.display("Login Successful");
+		  } 
+		  catch (RuntimeException e) {
+			  clientUI.display("Error: Already Connected");
+		  }
+		  catch (IOException e) {
+			  clientUI.display("Error: Host name or Port Number is wrong");
+		  }
+		  
 	  }
 	  else if (command.equals("#gethost")) {
-		  System.out.println(getHost());
+		  clientUI.display(getHost());
 	  }
 	  else if (command.equals("#getport")) {
-		  System.out.println(getPort());
+		  clientUI.display(""+getPort());
 	  }
 	  
 		  

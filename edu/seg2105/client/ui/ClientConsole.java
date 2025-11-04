@@ -3,7 +3,7 @@ package edu.seg2105.client.ui;
 // "Object Oriented Software Engineering" and is issued under the open-source
 // license found at www.lloseng.com 
 
-import java.io.*;
+	import java.io.*;
 import java.util.Scanner;
 
 import edu.seg2105.client.backend.ChatClient;
@@ -93,6 +93,7 @@ public class ClientConsole implements ChatIF
     {
       System.out.println
         ("Unexpected error while reading from console!");
+    	System.out.println(ex);
     }
   }
 

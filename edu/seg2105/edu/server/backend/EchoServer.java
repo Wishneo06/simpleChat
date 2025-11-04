@@ -48,8 +48,13 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
   {
-    System.out.println("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+	if (msg.toString().equals("#quit") || msg.toString().equals("#logoff")) {
+		clientDisconnected(client);
+	}
+	else {
+	    System.out.println("Message received: " + msg + " from " + client);
+	    this.sendToAllClients(msg);
+	}
   }
     
   /**
