@@ -29,6 +29,8 @@ public class ChatClient extends AbstractClient
    * the display method in the client.
    */
   ChatIF clientUI; 
+  
+  String clientID;
 
   
   //Constructors ****************************************************
@@ -41,17 +43,19 @@ public class ChatClient extends AbstractClient
    * @param clientUI The interface type variable.
    */
   
-  public ChatClient(String host, int port, ChatIF clientUI) 
+  public ChatClient(String host, int port, ChatIF clientUI, String clientID) 
     throws IOException 
   {
     super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
+    this.clientID = clientID;
     openConnection();
+    
   }
 
   
   //Instance methods ************************************************
-    
+  
   /**
    * This method handles all data that comes in from the server.
    *
@@ -59,8 +63,8 @@ public class ChatClient extends AbstractClient
    */
   public void handleMessageFromServer(Object msg) 
   {
-    clientUI.display(msg.toString());
-    
+//    clientUI.display(msg.toString());
+    System.out.println(msg.toString());
     
   }
 
@@ -140,8 +144,7 @@ public class ChatClient extends AbstractClient
 		  }
 		  catch (IOException e) {
 			  clientUI.display("Error: Host name or Port Number is wrong");
-		  }
-		  
+		  }		  
 	  }
 	  else if (command.equals("#gethost")) {
 		  clientUI.display(getHost());
@@ -149,8 +152,10 @@ public class ChatClient extends AbstractClient
 	  else if (command.equals("#getport")) {
 		  clientUI.display(""+getPort());
 	  }
-	  
-		  
+	  else {
+		  clientUI.display("Invalid Input");
+	  }
+	 		  
   }
   
   /**
@@ -190,5 +195,6 @@ public class ChatClient extends AbstractClient
   		clientUI.display("The server has shut down");
   		quit();
 	}
+  	
 }
 //End of ChatClient class
