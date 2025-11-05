@@ -59,14 +59,34 @@ public class EchoServer extends AbstractServer
    */
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
-  {
+  {	  
+	
+	  System.out.println("Message received: " + msg.toString() + " from " + client.getInfo("loginID"));  
+	
 	if (msg.toString().equals("#quit") || msg.toString().equals("#logoff")) {
 		clientDisconnected(client);
 	}
-	else {
-	    System.out.println("Message received: " + msg + " from " + client);
-	    this.sendToAllClients(msg);
+	else if (msg.toString().startsWith("#login")) {
+		if (client.getInfo("loginID")==null) {
+			String temp [] = msg.toString().split(" ");
+			try {
+				client.setInfo("loginID", temp[1]);
+				System.out.println(client.getInfo("loginID") +" has logged on.");
+			} catch (ArrayIndexOutOfBoundsException e) {
+				System.out.println("Error: No Login ID");
+			}
+		}
+		else {
+			try {
+				client.sendToClient("Error: Already Logged in, Client Closing");
+				client.close();
+			} catch (IOException e) {
+				
+			}
+		}
 	}
+	else
+		this.sendToAllClients("From " + client.getInfo("loginID") + ": " + msg);
   }
   
   /**
@@ -98,7 +118,6 @@ public class EchoServer extends AbstractServer
 	  }
 	  else if (command.equals("#close")) {
 			close();
-			serverUI.display("Server Closed");
 	  }
 	  else if (command.startsWith("#setport")) {
 		    if (isListening()) {
@@ -125,9 +144,6 @@ public class EchoServer extends AbstractServer
 	  else if (command.equals("#getport")) {
 		  	serverUI.display(getPort()+"");
 	  }
-	  else {
-		  serverUI.display("Invalid Command");
-	  }
   }
     
   /**
@@ -151,12 +167,12 @@ public class EchoServer extends AbstractServer
   }
   
 	protected void clientConnected(ConnectionToClient client) {
-		System.out.println("Client has connected");
+		System.out.println("A new client has connected to the server.");
 	}
 
 	synchronized protected void clientDisconnected(ConnectionToClient client) {
 		super.clientDisconnected(client);
-		System.out.println("Client Has Disconnected");
+		System.out.println(client.getInfo("loginID") + " Has Disconnected");
 	}
 	
 	public void quit() throws IOException{

@@ -50,7 +50,8 @@ public class ChatClient extends AbstractClient
     this.clientUI = clientUI;
     this.clientID = clientID;
     openConnection();
-    
+    sendToServer("#login " + clientID);
+    System.out.println(clientID + " has logged on.");
   }
 
   
@@ -63,8 +64,7 @@ public class ChatClient extends AbstractClient
    */
   public void handleMessageFromServer(Object msg) 
   {
-//    clientUI.display(msg.toString());
-    System.out.println(msg.toString());
+    clientUI.display(msg.toString());
     
   }
 
@@ -132,30 +132,35 @@ public class ChatClient extends AbstractClient
 			  clientUI.display("Error: Invalid Input for port");
 		  }
 	  }
-	  else if (command.equals("#login")) {
-		  try {
-			  if (isConnected())
-				  throw new RuntimeException();
-			  openConnection();
-			  clientUI.display("Login Successful");
-		  } 
-		  catch (RuntimeException e) {
-			  clientUI.display("Error: Already Connected");
+	  else if (command.startsWith("#login")) {
+		  if (command.equals("#login")) {
+			  try {
+				  if (isConnected())
+					  throw new RuntimeException();
+				  openConnection();
+				  System.out.println(clientID + " has logged on.");
+			  } 
+			  catch (RuntimeException e) {
+				  clientUI.display("Error: Already Connected");
+			  }
+			  catch (IOException e) {
+				  clientUI.display("Error: Host name or Port Number is wrong");
+			  }		  
 		  }
-		  catch (IOException e) {
-			  clientUI.display("Error: Host name or Port Number is wrong");
-		  }		  
+		  else {
+			  try {
+				sendToServer(command);
+			} catch (IOException e) {
+
+			}
+		  }
 	  }
 	  else if (command.equals("#gethost")) {
 		  clientUI.display(getHost());
 	  }
 	  else if (command.equals("#getport")) {
 		  clientUI.display(""+getPort());
-	  }
-	  else {
-		  clientUI.display("Invalid Input");
-	  }
-	 		  
+	  }	  
   }
   
   /**

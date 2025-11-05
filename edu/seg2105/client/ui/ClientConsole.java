@@ -56,14 +56,14 @@ public class ClientConsole implements ChatIF
     
     try 
     {
-      if (logID.isBlank()) {
-    	  display("Please enter an ID: ");
-    	  logID = fromConsole.nextLine();
-    	  if (logID.isBlank()) {
-    		  display("ID can not be blank, Client Closing");
-    		  System.exit(0);
-    	  }
-      }
+//      if (logID.isBlank()) {
+//    	  display("Please enter an ID: ");
+//    	  logID = fromConsole.nextLine();
+//    	  if (logID.isBlank()) {
+//    		  display("ID can not be blank, Client Closing");
+//    		  System.exit(0);
+//    	  }
+//      }
       client= new ChatClient(host, port, this, logID);
             
     } 
@@ -127,20 +127,29 @@ public class ClientConsole implements ChatIF
     int port = 0;
     String loginID = "";
     
+    try {
+    	loginID = args[0];
+    } catch (ArrayIndexOutOfBoundsException e) {
+    	loginID = "";
+    }
+    
     try
-    {
-      loginID = args[0];
+    {     
       host = args[1];
       port = Integer.parseInt(args[2]);
     }
     catch(ArrayIndexOutOfBoundsException e)
     {
-      loginID = "";
       host = "localhost";
       port = DEFAULT_PORT;
     }
     catch(NumberFormatException e) {
     	port = DEFAULT_PORT;
+    }
+    
+    if (loginID.isBlank()) {
+    	System.out.println("ERROR - No login ID specified.  Connection aborted.");
+    	System.exit(0);
     }
     ClientConsole chat= new ClientConsole(host, port, loginID);
     chat.accept();  //Wait for console data
